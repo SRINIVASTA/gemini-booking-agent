@@ -18,23 +18,26 @@ SCOPES = ['https://googleapis.com']
 def get_calendar_service():
     """Initializes the secure connection directly from Streamlit configuration secrets."""
     creds = None
+    # 1. Look for a valid existing token
     if os.path.exists('token.json'):
-        creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+        try:
+            creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+        except Exception:
+            # Delete corrupted tokens automatically
+            os.remove('token.json')
         
+    # 2. If token is invalid or missing, launch the server-safe console flow
     if not creds or not creds.valid:
-        # Fetching directly from Streamlit Secrets
         secret_data = {"web": dict(st.secrets["GOOGLE_CLIENT_SECRET"])}
         flow = InstalledAppFlow.from_client_config(secret_data, SCOPES)
-        creds = flow.run_local_server(
-            port=0, 
-            authorization_prompt_message="Please visit this URL to authorize the app: {url}",
-            success_message="The authentication flow has completed. You may close this window."
-        )
+        
+        # FIX: Using run_console() prevents Streamlit from dropping the port loop
+        creds = flow.run_console()
+        
         with open('token.json', 'w') as token:
             token.write(creds.to_json())
             
     return build('calendar', 'v3', credentials=creds)
-
 # ==========================================
 # 2. DEFINE NATIVE CALENDAR TOOL
 # ==========================================
