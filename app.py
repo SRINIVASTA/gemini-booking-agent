@@ -10,23 +10,25 @@ from datetime import datetime, timedelta
 # 1. CORE GOOGLE CALENDAR SERVICE PIPELINE
 # ==========================================
 def get_calendar_service():
-    """Initializes the secure connection using a headless cloud Service Account."""
-    # Define production scope boundaries
+    """Initializes a headless connection using a persistent OAuth Refresh Token."""
+    # Define valid Google Calendar Scope URLs
     SCOPES = ['https://googleapis.com']
     
     try:
-        # Pull the structured JSON block directly from Streamlit's secrets manager
-        service_account_info = dict(st.secrets["GOOGLE_SERVICE_ACCOUNT"])
-        
-        creds = service_account.Credentials.from_service_account_info(
-            service_account_info, 
+        # Reconstruct credential token data structures dynamically
+        creds = Credentials(
+            token=None,  # Will automatically generate an active token via the refresh key
+            refresh_token=st.secrets["GOOGLE_REFRESH_TOKEN"]["refresh_token"],
+            token_uri=st.secrets["GOOGLE_CLIENT_SECRET"]["token_uri"],
+            client_id=st.secrets["GOOGLE_CLIENT_SECRET"]["client_id"],
+            client_secret=st.secrets["GOOGLE_CLIENT_SECRET"]["client_secret"],
             scopes=SCOPES
         )
+        
         return build('calendar', 'v3', credentials=creds)
     except Exception as credential_error:
-        st.error("🔒 Auth Configuration Missing: Make sure GOOGLE_SERVICE_ACCOUNT is set in your Streamlit Secrets.")
+        st.error("🔒 Configuration Error: Check your GOOGLE_REFRESH_TOKEN block inside Streamlit Secrets.")
         raise credential_error
-
 # ==========================================
 # 2. DEFINE NATIVE CALENDAR TOOL
 # ==========================================
