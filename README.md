@@ -51,7 +51,7 @@ type = "service_account"
 project_id = "YOUR_PROJECT_ID"
 private_key_id = "YOUR_PRIVATE_KEY_ID"
 private_key = "YOUR_PRIVATE_KEY"
-client_email = "YOUR_SERVICE_ACCOUNT_EMAIL"
+client_email = "your-bot-name@://gserviceaccount.com"
 client_id = "YOUR_CLIENT_ID"
 auth_uri = "https://google.com"
 token_uri = "https://googleapis.com"
@@ -69,7 +69,7 @@ Because a Service Account acts as an independent virtual profile identity, your 
 1. Open your browser to the **[Google Calendar Workspace Dashboard](https://google.com)**.
 2. Hover over your primary calendar name in the left menu, click the **three dots (...)**, and select **Settings and sharing**.
 3. Head down to the **Share with specific people or groups** structural segment and click **Add people**.
-4. Paste the bot identifier email address generated in Step 1.
+4. Paste the dummy bot identifier email address generated in Step 1 (`your-bot-name@://gserviceaccount.com`).
 5. Toggle the operational permission rights selection to **Make changes to events**, then click **Send**.
 
 ---
@@ -85,9 +85,9 @@ streamlit run app.py
 Provide your developer API authorization key within the sidebar text panel to unlock the agent conversation model, then execute transaction prompts like the example below:
 
 ```text
-User: Book a meeting for srinivas, email: hisrinivas1972@gmail.com, on September 12, 2026 at 10:00 AM.
+User: Book a meeting for John Doe, email: johndoe@example.com, on September 12, 2026 at 10:00 AM.
 
-Assistant: Thank you for providing the details. To confirm, you'd like to book a meeting for Srinivas at hisrinivas1972@gmail.com on September 12, 2026, at 10:00 AM. Is that correct?
+Assistant: Thank you for providing the details. To confirm, you'd like to book a meeting for John Doe at johndoe@example.com on September 12, 2026, at 10:00 AM. Is that correct?
 
 User: yes
 
