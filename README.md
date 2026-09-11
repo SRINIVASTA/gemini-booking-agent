@@ -1,4 +1,4 @@
-# 🤖 Pure Gemini Booking Engine
+# 🤖 Gemini Booking Agent
 
 An autonomous, production-grade scheduling chatbot application built with **Python**, **Streamlit**, and the **Google GenAI SDK**. The agent interacts natively with users to extract scheduling parameters (Name, Email, Date, and Time), tracks conversation state accurately across messages, and autonomously updates your calendar via the Google Calendar API using a secure, headless Cloud Service Account setup.
 
@@ -30,11 +30,11 @@ streamlit
 ## 🚀 Setup & Deployment Pipeline
 
 ### 1. Provision Your Google Cloud Service Account Bot
-To enable headless cloud scheduling without using external middleware like Composio:
+To enable headless cloud scheduling without using external middleware:
 1. Navigate to the **[Google Cloud Console](https://google.com)**.
 2. Go to **APIs & Services** > **Library**, search for the **Google Calendar API**, and click **Enable**.
 3. Head over to **IAM & Admin** > **Service Accounts** and click **Create Service Account**.
-4. Set the name identifier (e.g., `gemini-booking-bot`) and proceed to click **Create and Continue**, then click **Done** (skip optional role assignments).
+4. Set the name identifier (e.g., `gemini-booking-agent`) and proceed to click **Create and Continue**, then click **Done** (skip optional role assignments).
 5. Click on the email identifier of your new service account from the list.
 6. Navigate to the **Keys** tab, click **Add Key** > **Create New Key**, choose **JSON**, and select **Create**. A configuration key file will download to your machine.
 
