@@ -2,42 +2,31 @@ import streamlit as st
 import os
 from google import genai
 from google.genai import types
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
+from google.oauth2 import service_account  # Added for cloud auth
 from googleapiclient.discovery import build
 from datetime import datetime, timedelta
 
 # ==========================================
-# FIX 1: USE VALID GOOGLE CALENDAR SCOPES
-# ==========================================
-SCOPES = ['https://googleapis.com']
-
-# ==========================================
-# 1. CORE GOOGLE CALENDAR CONNECTION PIPELINE
+# 1. CORE GOOGLE CALENDAR SERVICE PIPELINE
 # ==========================================
 def get_calendar_service():
-    """Initializes the secure connection directly from Streamlit configuration secrets."""
-    creds = None
-    # 1. Look for a valid existing token
-    if os.path.exists('token.json'):
-        try:
-            creds = Credentials.from_authorized_user_file('token.json', SCOPES)
-        except Exception:
-            # Delete corrupted tokens automatically
-            os.remove('token.json')
+    """Initializes the secure connection using a headless cloud Service Account."""
+    # Define production scope boundaries
+    SCOPES = ['https://googleapis.com']
+    
+    try:
+        # Pull the structured JSON block directly from Streamlit's secrets manager
+        service_account_info = dict(st.secrets["GOOGLE_SERVICE_ACCOUNT"])
         
-    # 2. If token is invalid or missing, launch the server-safe console flow
-    if not creds or not creds.valid:
-        secret_data = {"web": dict(st.secrets["GOOGLE_CLIENT_SECRET"])}
-        flow = InstalledAppFlow.from_client_config(secret_data, SCOPES)
-        
-        # FIX: Using run_console() prevents Streamlit from dropping the port loop
-        creds = flow.run_console()
-        
-        with open('token.json', 'w') as token:
-            token.write(creds.to_json())
-            
-    return build('calendar', 'v3', credentials=creds)
+        creds = service_account.Credentials.from_service_account_info(
+            service_account_info, 
+            scopes=SCOPES
+        )
+        return build('calendar', 'v3', credentials=creds)
+    except Exception as credential_error:
+        st.error("🔒 Auth Configuration Missing: Make sure GOOGLE_SERVICE_ACCOUNT is set in your Streamlit Secrets.")
+        raise credential_error
+
 # ==========================================
 # 2. DEFINE NATIVE CALENDAR TOOL
 # ==========================================
@@ -58,6 +47,8 @@ def google_calendar_create_event(name: str, email: str, start_time_iso: str) -> 
             'reminders': {'useDefault': True}
         }
 
+        # IMPORTANT: When using a Service Account, we write directly to the 
+        # service account's calendar, or a shared target calendar ID.
         event = service.events().insert(
             calendarId='primary', 
             body=event_payload, 
@@ -66,7 +57,6 @@ def google_calendar_create_event(name: str, email: str, start_time_iso: str) -> 
         
         return f"SUCCESS: Meeting successfully booked! Event Link: {event.get('htmlLink')}"
     except Exception as e:
-        # FORCE STREAMLIT TO SHOW THE RAW ERROR IN THE WEB UI
         st.error(f"🔴 CRITICAL TOOL CRASH: {str(e)}")
         import traceback
         st.code(traceback.format_exc())
