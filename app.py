@@ -66,6 +66,10 @@ def google_calendar_create_event(name: str, email: str, start_time_iso: str) -> 
         
         return f"SUCCESS: Meeting successfully booked! Event Link: {event.get('htmlLink')}"
     except Exception as e:
+        # FORCE STREAMLIT TO SHOW THE RAW ERROR IN THE WEB UI
+        st.error(f"🔴 CRITICAL TOOL CRASH: {str(e)}")
+        import traceback
+        st.code(traceback.format_exc())
         return f"ERROR: Failed to book calendar event due to: {str(e)}"
 
 # ==========================================
