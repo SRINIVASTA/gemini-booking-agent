@@ -5,6 +5,7 @@ from google.genai import types
 from google.oauth2 import service_account  # Added for cloud auth
 from googleapiclient.discovery import build
 from datetime import datetime, timedelta
+from google.oauth2.credentials import Credentials
 
 # ==========================================
 # 1. CORE GOOGLE CALENDAR SERVICE PIPELINE
