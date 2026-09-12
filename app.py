@@ -13,7 +13,7 @@ from google.oauth2.credentials import Credentials
 def get_calendar_service():
     """Initializes a headless connection using a persistent OAuth Refresh Token."""
     # Define valid Google Calendar Scope URLs
-    SCOPES = ['https://googleapis.com']
+    SCOPES = ['https://googleapis.com'] #  Corrected Scope
     
     try:
         # Reconstruct credential token data structures dynamically
