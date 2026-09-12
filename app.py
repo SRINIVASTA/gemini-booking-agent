@@ -15,11 +15,10 @@ def get_calendar_service():
     SCOPES = ['https://googleapis.com']
     
     try:
-        # Load the configuration directly from Streamlit Secrets
-        # We use .to_dict() to prevent modifying the read-only st.secrets object
+        # Load the configuration directly from Streamlit Secrets as a standard dictionary
         service_account_info = dict(st.secrets["GOOGLE_SERVICE_ACCOUNT"])
         
-        # FIX: Convert literal "\n" strings into actual newline breaks
+        # Replace the string literal text versions of '\n' with real newline objects
         if "private_key" in service_account_info:
             service_account_info["private_key"] = service_account_info["private_key"].replace("\\n", "\n")
         
