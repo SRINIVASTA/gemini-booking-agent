@@ -12,14 +12,18 @@ from google.oauth2.credentials import Credentials
 # ==========================================
 def get_calendar_service():
     """Initializes a headless connection using a Google Service Account."""
-    # Corrected full access scope for calendar modifications
     SCOPES = ['https://googleapis.com']
     
     try:
-        # Load the configuration directly from the GOOGLE_SERVICE_ACCOUNT block
-        service_account_info = st.secrets["GOOGLE_SERVICE_ACCOUNT"]
+        # Load the configuration directly from Streamlit Secrets
+        # We use .to_dict() to prevent modifying the read-only st.secrets object
+        service_account_info = dict(st.secrets["GOOGLE_SERVICE_ACCOUNT"])
         
-        # Build the credentials using the service_account module already imported at the top
+        # FIX: Convert literal "\n" strings into actual newline breaks
+        if "private_key" in service_account_info:
+            service_account_info["private_key"] = service_account_info["private_key"].replace("\\n", "\n")
+        
+        # Build the credentials
         creds = service_account.Credentials.from_service_account_info(
             service_account_info, 
             scopes=SCOPES
