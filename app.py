@@ -11,24 +11,33 @@ from google.oauth2.credentials import Credentials
 # 1. CORE GOOGLE CALENDAR SERVICE PIPELINE
 # ==========================================
 def get_calendar_service():
-    """Initializes a headless connection using a Google Service Account."""
+    """Initializes a headless connection using a Google Service Account with rigid endpoints."""
     SCOPES = ['https://googleapis.com']
     
     try:
-        # Load the configuration directly from Streamlit Secrets as a standard dictionary
-        service_account_info = dict(st.secrets["GOOGLE_SERVICE_ACCOUNT"])
+        # 1. Load the secrets dictionary safely
+        secrets_raw = st.secrets["GOOGLE_SERVICE_ACCOUNT"]
         
-        # Replace the string literal text versions of '\n' with real newline objects
-        if "private_key" in service_account_info:
-            service_account_info["private_key"] = service_account_info["private_key"].replace("\\n", "\n")
+        # 2. Build an explicit dictionary structure to avoid any hidden format clipping
+        service_account_info = {
+            "type": "service_account",
+            "project_id": str(secrets_raw["project_id"]).strip(),
+            "private_key_id": str(secrets_raw["private_key_id"]).strip(),
+            # Safely parse structural or literal linebreaks cleanly
+            "private_key": str(secrets_raw["private_key"]).replace("\\n", "\n").strip(),
+            "client_email": str(secrets_raw["client_email"]).strip(),
+            "client_id": str(secrets_raw["client_id"]).strip(),
+            "token_uri": "https://googleapis.com",  # Hardcoded fallback to guarantee correctness
+            "auth_uri": "https://google.com"
+        }
         
-        # Build the credentials
+        # 3. Authenticate with Google
         creds = service_account.Credentials.from_service_account_info(
             service_account_info, 
             scopes=SCOPES
         )
-        
         return build('calendar', 'v3', credentials=creds)
+        
     except Exception as credential_error:
         st.error("🔒 Configuration Error: Verify your GOOGLE_SERVICE_ACCOUNT block inside Streamlit Secrets.")
         raise credential_error
